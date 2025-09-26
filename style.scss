@@ -1,0 +1,135 @@
+@import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap');
+
+body {
+  --tab-bg: #EEE;
+  --tab-bg-active: black;
+  --tab-text: black;
+  --tab-text-active: white;
+
+  padding: 2rem;
+  font-family: 'Pixelify Sans', sans-serif;
+  letter-spacing: 2px;
+  line-height: 1.5;
+
+  background:
+    linear-gradient(90deg, #EEE 2px, transparent 2px) 0 -1.5rem / 3rem 3rem repeat,
+    linear-gradient(#EEE 2px, transparent 2px) -1.5rem 0 / 3rem 3rem repeat;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+/* botão na caixinha */
+.modal-button {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  border: 2px solid black;
+  background: white;
+  color: black;
+  font-family: 'Pixelify Sans', sans-serif;
+  text-decoration: none;
+  text-align: center;
+  transition: background 0.2s, color 0.2s;
+
+  &:hover {
+    background: black;
+    color: white;
+  }
+}
+
+
+
+/* modal */
+.modal {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  background-color: rgba(0, 0, 0, 0.5);
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:target {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+.modal-content {
+  width: 35rem;
+  background-color: white;
+  padding: 2rem;
+  position: relative;
+  border: 2px solid black;
+}
+
+.modal-close-button {
+  text-decoration: none;
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: inline-block;
+  width: 2rem;
+  height: 2rem;
+  line-height: 2rem;
+  text-align: center;
+  color: black;
+  font-weight: bold;
+}
+
+/* tabs */
+.tab-menu {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.tab-menu__button {
+  appearance: none;
+  border: 0;
+  background: var(--tab-bg);
+  color: var(--tab-text);
+  padding: 0.75rem 1rem;
+  letter-spacing: 2px;
+  font-family: 'Pixelify Sans', sans-serif;
+
+  &.is-active {
+    background: var(--tab-bg-active);
+    color: var(--tab-text-active);
+  }
+}
+
+.tab-panel {
+  display: none;
+  border: 2px solid black;
+  padding: 1rem 2rem;
+  background: white;
+  max-width: 600px;
+  text-align: center;
+  box-shadow: 4px 4px 0 black;
+
+  opacity: 0;                 
+  transform: translateY(10px); 
+  transition: opacity 0.6s ease, transform 0.6s ease;
+
+  &.is-active {
+    display: block;
+    opacity: 1;               
+    transform: translateY(0); 
+  }
+}
+
+.tab-panel__heading {
+  text-transform: uppercase;
+}
+
+.hidden {
+   display: none;
+}
