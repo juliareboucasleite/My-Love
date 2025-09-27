@@ -64,108 +64,64 @@ setInterval(updateDayCounter, 1000);
 updateDayCounter();
 
 
-// --------- CARTAS --------- //
-const letters = document.querySelectorAll(".letter");
-const nav = document.querySelector(".letter-nav");
-let currentLetter = 0;
-let buttonsPerPage = 5;
-let currentPage = 0;
+// --------- FUNÇÃO GENÉRICA DE NAVEGAÇÃO --------- //
+function createNavigator(containerSelector, navSelector, perPage = 5) {
+  const items = document.querySelectorAll(`${containerSelector} .letter`);
+  const nav = document.querySelector(navSelector);
+  if (!items.length || !nav) return; // nada a fazer se não tiver itens
 
-function renderButtons() {
-  nav.innerHTML = "";
-  const start = currentPage * buttonsPerPage;
-  const end = Math.min(start + buttonsPerPage, letters.length);
+  let currentIndex = 0;
+  let currentPage = 0;
 
-  if (currentPage > 0) {
-    const prevBtn = document.createElement("button");
-    prevBtn.textContent = "«";
-    prevBtn.classList.add("letter-btn");
-    prevBtn.addEventListener("click", () => {
-      currentPage--;
-      renderButtons();
-    });
-    nav.appendChild(prevBtn);
+  function renderButtons() {
+    nav.innerHTML = "";
+    const start = currentPage * perPage;
+    const end = Math.min(start + perPage, items.length);
+
+    if (currentPage > 0) {
+      const prevBtn = document.createElement("button");
+      prevBtn.textContent = "«";
+      prevBtn.classList.add("letter-btn");
+      prevBtn.addEventListener("click", () => {
+        currentPage--;
+        renderButtons();
+      });
+      nav.appendChild(prevBtn);
+    }
+
+    for (let i = start; i < end; i++) {
+      const btn = document.createElement("button");
+      btn.textContent = i + 1;
+      btn.classList.add("letter-btn");
+      if (i === currentIndex) btn.classList.add("is-active");
+      btn.addEventListener("click", () => showItem(i));
+      nav.appendChild(btn);
+    }
+
+    if (end < items.length) {
+      const nextBtn = document.createElement("button");
+      nextBtn.textContent = "»";
+      nextBtn.classList.add("letter-btn");
+      nextBtn.addEventListener("click", () => {
+        currentPage++;
+        renderButtons();
+      });
+      nav.appendChild(nextBtn);
+    }
   }
 
-  for (let i = start; i < end; i++) {
-    const btn = document.createElement("button");
-    btn.textContent = i + 1;
-    btn.classList.add("letter-btn");
-    if (i === currentLetter) btn.classList.add("is-active");
-    btn.addEventListener("click", () => showLetter(i));
-    nav.appendChild(btn);
+  function showItem(index) {
+    items[currentIndex].classList.remove("is-active");
+    currentIndex = index;
+    items[currentIndex].classList.add("is-active");
+    renderButtons();
   }
 
-  if (end < letters.length) {
-    const nextBtn = document.createElement("button");
-    nextBtn.textContent = "»";
-    nextBtn.classList.add("letter-btn");
-    nextBtn.addEventListener("click", () => {
-      currentPage++;
-      renderButtons();
-    });
-    nav.appendChild(nextBtn);
-  }
+  // inicia
+  showItem(0);
 }
+// Navegação para Cartas
+createNavigator(".cartas", ".cartas-nav");
 
-function showLetter(index) {
-  letters[currentLetter].classList.remove("is-active");
-  currentLetter = index;
-  letters[currentLetter].classList.add("is-active");
-  renderButtons();
-}
-showLetter(0);
-
-// --------- LEIA-ME --------- //
-const leias = document.querySelectorAll(".leias .letter");
-const leiasNav = document.querySelector(".leias-nav");
-let currentLeia = 0;
-let leiasPerPage = 5;
-let currentLeiaPage = 0;
-
-function renderLeiasButtons() {
-  leiasNav.innerHTML = "";
-  const start = currentLeiaPage * leiasPerPage;
-  const end = Math.min(start + leiasPerPage, leias.length);
-
-  if (currentLeiaPage > 0) {
-    const prevBtn = document.createElement("button");
-    prevBtn.textContent = "«";
-    prevBtn.classList.add("letter-btn");
-    prevBtn.addEventListener("click", () => {
-      currentLeiaPage--;
-      renderLeiasButtons();
-    });
-    leiasNav.appendChild(prevBtn);
-  }
-
-  for (let i = start; i < end; i++) {
-    const btn = document.createElement("button");
-    btn.textContent = i + 1;
-    btn.classList.add("letter-btn");
-    if (i === currentLeia) btn.classList.add("is-active");
-    btn.addEventListener("click", () => showLeia(i));
-    leiasNav.appendChild(btn);
-  }
-
-  if (end < leias.length) {
-    const nextBtn = document.createElement("button");
-    nextBtn.textContent = "»";
-    nextBtn.classList.add("letter-btn");
-    nextBtn.addEventListener("click", () => {
-      currentLeiaPage++;
-      renderLeiasButtons();
-    });
-    leiasNav.appendChild(nextBtn);
-  }
-}
-
-function showLeia(index) {
-  leias[currentLeia].classList.remove("is-active");
-  currentLeia = index;
-  leias[currentLeia].classList.add("is-active");
-  renderLeiasButtons();
-}
-
-showLeia(0);
-
+// Navegação para Leia-me
+createNavigator(".leias", ".leias-nav");
