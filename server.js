@@ -1,26 +1,44 @@
 const express = require("express");
-const fs = require("fs");
+const mysql = require("mysql2");
 const cors = require("cors");
+const bodyParser = require("body-parser");
 
 const app = express();
-const PORT = 3000;
-const DB_FILE = "comentarios.json";
-
-app.use(express.json());
 app.use(cors());
+app.use(bodyParser.json());
 
-// Listar comentários
+// conexão com o MySQL
+const db = mysql.createConnection({
+  host: "localhost",
+  user: "root",      // seu usuário
+  password: "senha", // sua senha
+  database: "mylove"
+});
+
+// rota para buscar todos os comentários
 app.get("/comentarios", (req, res) => {
-  const data = fs.existsSync(DB_FILE) ? JSON.parse(fs.readFileSync(DB_FILE)) : [];
-  res.json(data);
+  db.query("SELECT * FROM comentarios ORDER BY created_at DESC", (err, results) => {
+    if (err) return res.status(500).json(err);
+    res.json(results);
+  });
 });
 
-// Salvar comentário
+// rota para salvar novo comentário
 app.post("/comentarios", (req, res) => {
-  const data = fs.existsSync(DB_FILE) ? JSON.parse(fs.readFileSync(DB_FILE)) : [];
-  data.push(req.body);
-  fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
-  res.json({ ok: true });
+  const { trechoId, texto, comentario } = req.body;
+  if (!trechoId || !texto || !comentario) {
+    return res.status(400).json({ error: "Faltam campos obrigatórios" });
+  }
+
+  db.query(
+    "INSERT INTO comentarios (trechoId, texto, comentario) VALUES (?, ?, ?)",
+    [trechoId, texto, comentario],
+    (err, result) => {
+      if (err) return res.status(500).json(err);
+      res.json({ id: result.insertId, trechoId, texto, comentario });
+    }
+  );
 });
 
+const PORT = 3000;
 app.listen(PORT, () => console.log(`Servidor rodando em http://localhost:${PORT}`));

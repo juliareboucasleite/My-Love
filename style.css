@@ -243,6 +243,32 @@ position: relative;
   border-radius: 4px;
 }
 
+.comentado {
+  text-decoration: underline;
+  text-decoration-color: #ff69b4;
+  text-decoration-thickness: 2px;
+  cursor: pointer;
+  position: relative;
+}
+
+.balao {
+  position: absolute;
+  background: white;
+  border: 1px solid #aaa;
+  box-shadow: 2px 2px 6px rgba(0,0,0,0.2);
+  padding: 0.5rem;
+  border-radius: 5px;
+  top: 1.5rem;
+  left: 0;
+  z-index: 10;
+  font-size: 0.9em;
+  display: none;
+}
+
+.comentado:hover .balao {
+  display: block;
+}
+
 
 
 /*# sourceMappingURL=style.css.map */
