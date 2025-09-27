@@ -116,4 +116,56 @@ function showLetter(index) {
 }
 showLetter(0);
 
-document.addEventListener("DOMContentLoaded", carregarComentarios);
+// --------- LEIA-ME --------- //
+const leias = document.querySelectorAll(".leias .letter");
+const leiasNav = document.querySelector(".leias-nav");
+let currentLeia = 0;
+let leiasPerPage = 5;
+let currentLeiaPage = 0;
+
+function renderLeiasButtons() {
+  leiasNav.innerHTML = "";
+  const start = currentLeiaPage * leiasPerPage;
+  const end = Math.min(start + leiasPerPage, leias.length);
+
+  if (currentLeiaPage > 0) {
+    const prevBtn = document.createElement("button");
+    prevBtn.textContent = "«";
+    prevBtn.classList.add("letter-btn");
+    prevBtn.addEventListener("click", () => {
+      currentLeiaPage--;
+      renderLeiasButtons();
+    });
+    leiasNav.appendChild(prevBtn);
+  }
+
+  for (let i = start; i < end; i++) {
+    const btn = document.createElement("button");
+    btn.textContent = i + 1;
+    btn.classList.add("letter-btn");
+    if (i === currentLeia) btn.classList.add("is-active");
+    btn.addEventListener("click", () => showLeia(i));
+    leiasNav.appendChild(btn);
+  }
+
+  if (end < leias.length) {
+    const nextBtn = document.createElement("button");
+    nextBtn.textContent = "»";
+    nextBtn.classList.add("letter-btn");
+    nextBtn.addEventListener("click", () => {
+      currentLeiaPage++;
+      renderLeiasButtons();
+    });
+    leiasNav.appendChild(nextBtn);
+  }
+}
+
+function showLeia(index) {
+  leias[currentLeia].classList.remove("is-active");
+  currentLeia = index;
+  leias[currentLeia].classList.add("is-active");
+  renderLeiasButtons();
+}
+
+showLeia(0);
+
