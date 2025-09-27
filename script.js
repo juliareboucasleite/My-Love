@@ -126,5 +126,94 @@ function showLetter(index) {
 // inicia
 showLetter(0);
 
+// --------- COMENTÁRIOS --------- //
+function criarFormulario(paragrafo) {
+  if (paragrafo.querySelector(".balao-form")) return;
+
+  const form = document.createElement("div");
+  form.classList.add("balao-form");
+
+  form.innerHTML = `
+    <textarea placeholder="Escreva um comentário..." class="conteudo-input"></textarea>
+    <button type="button">Enviar</button>
+  `;
+
+  form.querySelector("button").addEventListener("click", async () => {
+    const conteudo = form.querySelector(".conteudo-input").value;
+    const trechoId = paragrafo.getAttribute("data-id");
+
+    if (!conteudo) return alert("Escreva um comentário!");
+
+    await fetch("http://localhost:3000/comentarios", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ trechoId, conteudo })
+    });
+
+    carregarComentarios();
+    form.remove();
+  });
+
+  paragrafo.appendChild(form);
+}
 
 
+async function carregarComentarios() {
+  const resposta = await fetch("http://localhost:3000/comentarios");
+  const comentarios = await resposta.json();
+
+  // Limpar
+  document.querySelectorAll(".paragrafo .comentarios").forEach(div => {
+    div.innerHTML = "";
+    div.classList.remove("mostrar");
+  });
+
+  // Preencher
+  comentarios.forEach(c => {
+    const paragrafo = document.querySelector(`.paragrafo[data-id="${c.trechoId}"]`);
+    if (paragrafo) {
+      const div = paragrafo.querySelector(".comentarios");
+      div.classList.add("mostrar");
+
+      const p = document.createElement("p");
+      p.classList.add("comentario");
+      p.textContent = `${c.autor}: ${c.conteudo}`;
+      div.appendChild(p);
+    }
+  });
+}
+
+function prepararParagrafos() {
+  const paragrafos = document.querySelectorAll(".letter p, .tab-panel p");
+
+  paragrafos.forEach((p, index) => {
+    if (p.closest(".paragrafo")) return; // já está tratado
+
+    const wrapper = document.createElement("div");
+    wrapper.classList.add("paragrafo");
+    wrapper.setAttribute("data-id", "p" + index);
+
+    const btn = document.createElement("button");
+    btn.classList.add("add-comentario");
+    btn.textContent = "+";
+
+    const comentariosDiv = document.createElement("div");
+    comentariosDiv.classList.add("comentarios");
+
+    p.parentNode.insertBefore(wrapper, p);
+    wrapper.appendChild(p);
+    wrapper.appendChild(btn);
+    wrapper.appendChild(comentariosDiv);
+
+    // evento do botão
+    btn.addEventListener("click", () => {
+      criarFormulario(wrapper);
+    });
+  });
+}
+
+// Inicializa
+document.addEventListener("DOMContentLoaded", () => {
+  prepararParagrafos();
+  carregarComentarios();
+});
