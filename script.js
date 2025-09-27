@@ -31,32 +31,38 @@ modalClose.addEventListener('click', () => {
 
 // --------- CONTADOR --------- //
 function updateDayCounter() {
-  const startDate = new Date(2025, 1, 2); // 02/02/2025
-  const today = new Date();
+  const startDate = new Date(2025, 0, 2, 0, 0, 0); // 02/01/2025 (mês começa em 0 → janeiro)
+  const now = new Date();
 
-  let years = today.getFullYear() - startDate.getFullYear();
-  let months = today.getMonth() - startDate.getMonth();
-  let days = today.getDate() - startDate.getDate();
+  // Diferença total em milissegundos
+  let diff = now - startDate;
 
-  if (days < 0) {
-    months--;
-    const prevMonth = new Date(today.getFullYear(), today.getMonth(), 0);
-    days += prevMonth.getDate();
-  }
+  // Converte
+  const msInSecond = 1000;
+  const msInMinute = msInSecond * 60;
+  const msInHour = msInMinute * 60;
+  const msInDay = msInHour * 24;
 
-  if (months < 0) {
-    years--;
-    months += 12;
-  }
+  let days = Math.floor(diff / msInDay);
+  diff %= msInDay;
 
-  let parts = [];
-  if (years > 0) parts.push(`${years} ${years === 1 ? "ano" : "anos"}`);
-  if (months > 0) parts.push(`${months} ${months === 1 ? "mês" : "meses"}`);
-  if (days >= 0) parts.push(`${days} ${days === 1 ? "dia" : "dias"}`);
+  let hours = Math.floor(diff / msInHour);
+  diff %= msInHour;
 
-  document.getElementById("day-counter").textContent = parts.join(", ");
+  let minutes = Math.floor(diff / msInMinute);
+  diff %= msInMinute;
+
+  let seconds = Math.floor(diff / msInSecond);
+
+  // Exibe bonitinho
+  document.getElementById("day-counter").textContent =
+    `${days} dias, ${hours} horas, ${minutes} minutos e ${seconds} segundos`;
 }
+
+// Atualiza a cada segundo
+setInterval(updateDayCounter, 1000);
 updateDayCounter();
+
 
 // --------- CARTAS --------- //
 const letters = document.querySelectorAll(".letter");
@@ -109,59 +115,5 @@ function showLetter(index) {
   renderButtons();
 }
 showLetter(0);
-
-// --------- COMENTÁRIOS POR SELEÇÃO --------- //
-document.addEventListener("mouseup", () => {
-  const selection = window.getSelection();
-  const texto = selection.toString().trim();
-
-  if (texto.length > 0) {
-    const comentario = prompt("Digite seu comentário para: " + texto);
-    if (!comentario) return;
-
-    const range = selection.getRangeAt(0);
-    const span = document.createElement("span");
-    const id = "c" + Date.now();
-
-    span.classList.add("comentado");
-    span.setAttribute("data-id", id);
-    span.textContent = texto;
-
-    const balao = document.createElement("div");
-    balao.classList.add("balao");
-    balao.textContent = comentario;
-    span.appendChild(balao);
-
-    range.deleteContents();
-    range.insertNode(span);
-
-    // Salvar no backend (json-server)
-    fetch("http://localhost:3000/comentarios", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ trechoId: id, texto, comentario })
-    });
-  }
-});
-
-// --------- CARREGAR COMENTÁRIOS --------- //
-async function carregarComentarios() {
-  const resposta = await fetch("http://localhost:3000/comentarios");
-  const comentarios = await resposta.json();
-
-  comentarios.forEach(c => {
-    // procurar se já existe esse trecho sublinhado
-    if (!document.querySelector(`[data-id="${c.trechoId}"]`)) {
-      const regex = new RegExp(c.texto, "g");
-      document.body.innerHTML = document.body.innerHTML.replace(
-        regex,
-        `<span class="comentado" data-id="${c.trechoId}">
-           ${c.texto}
-           <div class="balao">${c.comentario}</div>
-         </span>`
-      );
-    }
-  });
-}
 
 document.addEventListener("DOMContentLoaded", carregarComentarios);
